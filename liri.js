@@ -52,7 +52,13 @@ function spotifyThis() {
             if (err) {
                 return console.log('Error occurred: ' + err);
             };
-            console.log(data);
+            for (var i = 0; i < data.tracks.items.length; i++) {
+                console.log("===========================================\n")
+                console.log('Artist: ' + data.tracks.items[i].album.artists[0].name);
+                console.log('Song: ' + data.tracks.items[i].name);
+                console.log('Preview: ' + data.tracks.items[i].preview_url);
+                console.log("\n===========================================")
+            }
         });
     } else {
         spotify.search({ type: 'track', query: search }, function (err, data) {
