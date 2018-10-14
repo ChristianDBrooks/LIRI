@@ -1,5 +1,4 @@
 // SETUP
-
 require('dotenv').config();
 // Pulling local files.
 var keys = require("./keys")
@@ -31,9 +30,19 @@ function argumentConstructer(seperator) {
     return constructedArgument;
 }
 
-function concert() {
+function concert(input) {
+    var artist;
+    if (input) {
+        artist = input.split(" ").join('+');
+    } else {
+        atist = argumentConstructer("+");
+    }
     var artist = argumentConstructer("+");
+    console.log(artist);
     request("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp", function (err, response, body) {
+        if (err) {
+            console.log("Error: " + err);
+        }
         console.log("\n==============================================================\n")
         console.log('The next concert is "' + JSON.parse(body)[0].venue.name + '"');
         console.log('This concert is in: ' + JSON.parse(body)[0].venue.city + ", " + JSON.parse(body)[0].venue.region);
@@ -44,11 +53,17 @@ function concert() {
     })
 }
 
-function spotifyThis() {
-    var search = argumentConstructer(" ");
-    if (!process.argv[3]) {
+function spotifyThis(input) {
+    var search;
+    if (input) {
+        search = input;
+    } else {
+        search = argumentConstructer(" ");
+    }
+    console.log(search);
+    if (!search) {
         console.log("Defaulting to 'The Sign' by Ace of Base.");
-        spotify.search({ type: 'track', query: 'The Sign', limit: 3}, function (err, data) {
+        spotify.search({ type: 'track', query: 'The Sign', limit: 3 }, function (err, data) {
             if (err) {
                 return console.log('Error occurred: ' + err);
             };
@@ -61,15 +76,22 @@ function spotifyThis() {
             }
         });
     } else {
-        spotify.search({ type: 'track', query: search }, function (err, data) {
+        spotify.search({ type: 'track', query: search, limit: 3 }, function (err, data) {
             if (err) {
                 return console.log('Error occurred: ' + err);
+            };
+            for (var i = 0; i < data.tracks.items.length; i++) {
+                console.log("===========================================\n")
+                console.log('Artist: ' + data.tracks.items[i].album.artists[0].name);
+                console.log('Song: ' + data.tracks.items[i].name);
+                console.log('Preview: ' + data.tracks.items[i].preview_url);
+                console.log("\n===========================================")
             }
         });
     }
 }
 
-function movie() {
+function movie(input) {
     if (!process.argv[3]) {
         console.log("Defaulting to 'Mr. Nobody'");
         request("http://www.omdbapi.com/?apikey=fc40c3c&plot=full&t=Mr.+Nobody", function (err, response, body) {
@@ -87,7 +109,12 @@ function movie() {
             console.log("\n==============================================================\n")
         })
     } else {
-        var search = argumentConstructer("+");
+        var search;
+        if (input) {
+            search = input.split(" ").join('+');
+        } else {
+            search = argumentConstructer("+");
+        }
         request("http://www.omdbapi.com/?apikey=fc40c3c&plot=full&t=" + search, function (err, response, body) {
             console.log("\n==============================================================\n")
             console.log('Title: ' + JSON.parse(body).Title);
@@ -105,6 +132,21 @@ function movie() {
     }
 }
 
-// function doWhatItSays() {
+function doWhatItSays() {
+    fs.readFile('random.txt', "UTF-8", (err, data) => {
+        if (err) throw err;
+        data = data.split(",")
 
-// }
+        switch (data[0]) {
+            case 'concert-this':
+                concert(data[1])
+                break;
+            case 'spotify-this-song':
+                spotifyThis(data[1])
+                break;
+            case 'movie-this':
+                movie(data[1])
+                break;
+        }
+    });
+}
