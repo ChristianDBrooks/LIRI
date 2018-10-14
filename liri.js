@@ -35,9 +35,8 @@ function concert(input) {
     if (input) {
         artist = input.split(" ").join('+');
     } else {
-        atist = argumentConstructer("+");
+        artist = argumentConstructer("+");
     }
-    var artist = argumentConstructer("+");
     console.log(artist);
     request("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp", function (err, response, body) {
         if (err) {
